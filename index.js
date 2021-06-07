@@ -7,18 +7,35 @@ const io = new Server(server);
 
 let users = [];
 
+function newUser() {
+    const color = ["Red", "Green", "Blue", "Yellow", "Purple"]
+    const adjective = ["Shy", "Brave", "Hungry", "Diminutive", "Intelligent"]
+    const animal = ["Racoon", "Bear", "Ox", "Panda", "Gecko"]
+
+    function getRandomInt(max) {
+        return Math.floor(Math.random() * max);
+    }
+
+    let username = `${color[getRandomInt(5)]}${adjective[getRandomInt(5)]}${animal[getRandomInt(5)]}`
+    users.push(username);
+}
+
 app.get('/', (req, res) => {
   res.sendFile(__dirname +'/index.html');
 });
 
 io.on('connection', (socket) => {
-    console.log('a user connected');
+    newUser();
+
+    const user = users[users.length - 1];
+    io.emit('chat message', `Welcome, ${user}`)
+
     socket.on('disconnect', () => {
       console.log('user disconnected');
     });
     socket.on('chat message', (msg) => {
     console.log('message: ' + msg);
-    io.emit('chat message', msg);
+    io.emit('chat message',`${user}: ${msg}`);
     });
   });
 
