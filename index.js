@@ -30,13 +30,18 @@ io.on('connection', (socket) => {
     const user = users[users.length - 1];
     io.emit('chat message', `Welcome, ${user}`)
 
-    socket.on('disconnect', () => {
+    socket.on('disconnect', (user) => {
+      users.splice(users.indexOf(user), 1)
+      console.log(users) 
       console.log('user disconnected');
     });
+
     socket.on('chat message', (msg) => {
     console.log('message: ' + msg);
     io.emit('chat message',`${user}: ${msg}`);
     });
+
+    console.log(users);
     
     io.emit('list of users', users);
   });
