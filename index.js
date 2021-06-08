@@ -37,6 +37,8 @@ io.on('connection', (socket) => {
     console.log('message: ' + msg);
     io.emit('chat message',`${user}: ${msg}`);
     });
+    
+    io.emit('list of users', users);
   });
 
 
