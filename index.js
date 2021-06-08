@@ -32,9 +32,17 @@ io.on('connection', (socket) => {
 
     socket.on('disconnect', (user) => {
       users.splice(users.indexOf(user), 1)
-      console.log(users) 
+      console.log(users)
       console.log('user disconnected');
     });
+
+    socket.on('typing', (data) => {
+        if(data.typing == true) {
+            io.emit('typingIndicator', {data, user})
+        } else {
+            io.emit('typingIndicator', {data, user})
+        }
+    })
 
     socket.on('chat message', (msg) => {
     console.log('message: ' + msg);
@@ -42,7 +50,7 @@ io.on('connection', (socket) => {
     });
 
     console.log(users);
-    
+
     io.emit('list of users', users);
   });
 

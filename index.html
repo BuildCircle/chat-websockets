@@ -18,6 +18,7 @@
   <body>
     <ul id="users">List of Users</ul>
     <ul id="messages"></ul>
+    <span id="typingIndicator" style="visibility:hidden">Typing....</span>
     <form id="form" action="">
       <input id="input" autocomplete="off" /><button>Send</button>
     </form>
@@ -29,14 +30,35 @@
         var form = document.getElementById('form');
         var input = document.getElementById('input');
         var usersList = document.getElementById('users')
+        var typingIndicator = document.getElementById('typingIndicator')
+
+        var typing = false
 
         form.addEventListener('submit', function(e) {
+          console.log("submit")
           e.preventDefault();
           if (input.value) {
             socket.emit('chat message', input.value);
             input.value = '';
           }
         });
+
+        form.addEventListener('keydown', (e) => {
+          if (e || e.key === "Backspace") {
+            isTyping = () => {
+              if (input.value) {
+                socket.emit("typing", {typing:true})
+              }
+              setTimeout(() => {
+                if (!input.value || input.value == "") {
+                  socket.emit("typing", {typing:false})
+                }
+              }, 400)
+            }
+            isTyping();
+          }
+        })
+
 
         socket.on('chat message', function(msg) {
           var item = document.createElement('li');
@@ -67,6 +89,16 @@
             usersList.appendChild(li);
           })
         });
+
+        socket.on('typingIndicator', function(data) {
+          console.log(data)
+          if (data.data.typing == true) {
+            typingIndicator.innerHTML = `${data.user} is typing...`
+            typingIndicator.style = "visibility: visible"
+          } else {
+            typingIndicator.style = "visibility: hidden"
+          }
+        })
       </script>
   </body>
 </html>
